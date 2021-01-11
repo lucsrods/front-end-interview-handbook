@@ -235,3 +235,242 @@ Uma _closure_ é a combinação de uma função e um ambiente léxico dentro do 
 - https://medium.com/javascript-scene/master-the-javascript-interview-what-is-a-closure-b2f0d2152b36
 
 [[↑] Voltar ao topo](#table-of-contents)
+
+### Você pode descrever a principal diferença entre um loop `.forEach` e um loop `.map()` e por que você escolheria um versus o outro?
+
+Para entender a diferença entre os dois, vamos ver o que cada função faz.
+
+**`forEach`**
+
+- Itera entre os elementos do array.
+- Executa um _callback_ para cada elemento.
+- Não retorna um valor.
+
+```js
+const a = [1, 2, 3];
+const doubled = a.forEach(num, index) => {
+  // Faz algo com num e/ou index.
+};
+
+// doubled = undefined;
+```
+
+**`map`**
+
+- Itera entre os elementos do array.
+- "Mapeia" cada elemento a um novo elemento através da invocação da função para cada elemento, criando um novo array como resultado.
+
+```js
+const a = [1, 2, 3];
+const doubled = a.map((num) => {
+  return num * 2;
+});
+
+// doubled = [2, 4, 6]
+```
+
+A principal diferença entre `.forEach` e `.map()` é que `.map()` retorna um novo array. Se você precisa do resultado, mas não deseja transformar o array original, utilize `.map`. Se você deseja simplesmente iterar o array, `forEach` é a escolha certa.
+
+###### Referências (Inglês)
+
+- https://codeburst.io/javascript-map-vs-foreach-f38111822c0f
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Qual é um uso de caso típico para funções anônimas?
+
+Elas podem ser usadas em IIFEs para encapsular código dentro de um escopo local, para que então variáveis declaradas não "vazem" para o escopo global
+
+```js
+(function () {
+  // Algum código aqui.
+})();
+```
+
+Como um _callback_ que é usado uma vez e não precisa ser usado em mais nenhum lugar. O código parecerá mais independente e legível quando manipuladores são definidos dentro do código que os está invocando, ao invés de ter que procurar em outro lugar para encontrar o corpo da função.
+
+```js
+setTimeout(function () {
+  console.log('Hello world!');
+}, 1000);
+```
+
+Argumentos para _constructs_ de programação funcional ou Lodash (similar a _callbacks_).
+
+```js
+const arr = [1, 2, 3];
+const double = arr.map(function (el) {
+  return el * 2;
+});
+
+console.log(double); // [2, 4, 6]
+```
+
+###### Referências (Inglês)
+
+- https://www.quora.com/What-is-a-typical-usecase-for-anonymous-functions
+- https://stackoverflow.com/questions/10273185/what-are-the-benefits-to-using-anonymous-functions-instead-of-named-functions-fo
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Como você organiza seu código? (module pattern, herança clássica?)
+
+No passado, usei Backbone para meus _models_ o que me encorajava seguir uma abordagem mais Orientada a Objeto, criando _models_ em Backbone e anexando métodos a eles.
+
+O pattern _module_ ainda é ótimo, mas nos dias de hoje, eu uso React/Redux que utilizam um fluxo de dados unidirecional baseado na arquitetura Flux. Eu representaria os modelos do app usando objetos simples e escreveria funções puras para manipular estes objetos. O _State_ é manipulado usando ações e _reducers_ como em qualquer outra aplicação Redux.
+
+Eu evito usar herança clássica onde possível. Quando e se eu preciso, eu sigo [essas regras](https://medium.com/@dan_abramov/how-to-use-classes-and-sleep-at-night-9af8de78ccb4)
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Qual a diferença entre objetos hospedeiros e objetos nativos?
+
+Objetos nativos são objetos que são parte do JavaScript definidos pela especificação ECMAScript, tais como `String`, `Math`, `RegExp`, `Object`, `Function`, etc.
+
+Objetos hospedeiros são fornecidos pelo ambiente de execução (navegador ou Node), tais como `window`, `XMLHTTPRequest`, etc.
+
+###### Referências (Inglês)
+
+- https://stackoverflow.com/questions/7614317/what-is-the-difference-between-native-objects-and-host-objects
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Diferença entre: `function Pessoa(){}`, `var pessoa = Pessoa()`, e `var pessoa = new Pessoa()`?
+
+Esta pergunta é bem vaga. Meu melhor palpite é que sua intenção é saber a respeito de construtores em JavaScript. Falando tecnicamente, `function Pessoa(){}` é apenas uma declaração de função normal. A convenção é usar PascalCase para funções que são destinadas a serem usadas com construtores.
+
+`var person = Pessoa()` invoca `Pessoa` como uma função, e não como um construtor. Invocar dessa maneira é um erro comum se a pretensão for usar a função como construtor. Tipicamente, o construtor não retorna nada, consequentemente invocar o construtor como uma função normal irá retornar `undefined`, não a instância, que será atribuído à variável.
+
+`var person = new Pessoa()` cria uma instância do objeto `Pessoa` usando o operador `new`, o qual herda de `Pessoa.prototype`. Uma alternativa seria usar `Object.create`, such as: `Object.create (Person.prototype)`.
+
+```js
+function Pessoa(nome) {
+  this.nome = nome;
+}
+
+var pessoa = Pessoa('John');
+console.log(pessoa); // undefined
+console.log(pessoa.nome); // Uncaught TypeError: Cannot read property 'nome' of undefined
+
+var pessoa = new Pessoa('John');
+console.log(pessoa); // Pessoa { nome: "John" }
+console.log(pessoa.nome); // "John"
+```
+
+###### Referências (Inglês)
+
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Qual a diferência entre `.call` e `.apply`?
+
+Ambos `.call` e `.apply` são usados para invocar funções cujo primeiro parâmetro irá ser usado como valor do `this` dentro da função. Entretanto, `.call` aceita argumentos separados por vírgula a partir do segundo argumento enquanto `.apply` aceita um array de argumentos como segundo parâmetro. Um modo fácil de lembrar é: C de `call` e comma-separated (separados por vírgula) e A de `apply` e array de argumentos.
+
+```js
+function add(a, b) {
+  return a + b;
+}
+
+console.log(add.call(null, 1, 2));
+console.log(add.apply(null, [1, 2]));
+```
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Explique `Function.prototype.bind`
+
+> O método bind() cria uma nova função que, quando chamada, tem sua palavra-chave this definida com o valor fornecido, com uma sequência determinada de argumentos precedendo quaisquer outros que sejam fornecidos quando a nova função é chamada.
+
+Em minha experiência, é o mais útil para _bindar_ o valor do `this` em métodos de classes aos quais você quer passar para outras funções. Isso é frequentemente feito em componentes React.
+
+###### Referências (Inglês)
+
+- https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_objects/Function/bin
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Quando você usaria `document.write()`?
+
+O `document.write()` escreve uma string à uma stream de documento aberta pelo `document.open()`. Quando `document.write()` é executado depois da página ter carregado, ele irá chamar o `document.open` que limpará todo o documento (`<head>` e `<body>` são removidos!) e substitui o conteúdo com o valor do parâmetro dado. Portanto, ele é geralmente considerado perigoso e propenso a mau uso.
+
+Há algumas respostas online que explicam que o `document.write()` está sendo usado em códigos de analytics ou [quando você quer incluir estilos que somente devem funcionar se o JavaScript estiver habilitado](https://www.quirksmode.org/blog/archives/2005/06/three_javascrip_1.html). Ele até é usado em boilerplates de HTML5 para [carregar scripts em paralelo e preservar a ordem de execução](https://github.com/paulirish/html5-boilerplate/wiki/Script-Loading-Techniques#documentwrite-script-tag)! Entretanto, eu suspeito que esses motivos podem estar desatualizados e hoje em dia, podem ser alcançadas sem usar `document.write()`. Por favor me corrija se eu estiver errado a respeito disso.
+
+###### Referências (Inglês)
+
+- https://www.quirksmode.org/blog/archives/2005/06/three_javascrip_1.html
+- https://github.com/h5bp/html5-boilerplate/wiki/Script-Loading-Techniques#documentwrite-script-tag
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Qual é a diferença entre _feature detection_, _feature inference_, e _UA string_?
+
+**Feature Detection**
+
+_Feature detection_ envolve avaliar se um navegador suporta um determinado trecho de código, e executar um código diferente em caso dele não ser suportado, com isso o navegador poderia sempre oferecer uma experiência funcional ao invés de erros. Por exemplo:
+
+```js
+if ('geolocation' in navigator) {
+  // Pode usar navigator.geolocation
+} else {
+  // Lidar com a falta da feature
+}
+```
+
+[Modernizr](https://modernizr.com/) é uma ótima biblioteca para lidar com detecção de feature.
+
+**Feature Inference**
+
+_Feature inference_ avalia uma _feature_ assim como a _feature detection_, mas usa outra função porque é assumido que ela também existirá, por exemplo:
+
+```js
+if (document.getElementsByTagName) {
+  element = document.getElementById(id);
+}
+```
+
+Isso não é recomendado. _Feature detection_ é mais a prova de falhas.
+
+**UA String**
+
+É uma string de relatório do navegador que permite peers de protocolo de rede identificar o tipo da aplicação, sistema operacional, vendor de software ou versão de software do user agent fazendo a requisição. Pode ser acessado via `navigator.userAgent`. Entretanto, a string é complicada de _parsear_ e pode ser burlada. Por exemplo, o Chrome relata ambos Chrome e Safari. Então, para detectar o Safari você tem que procurar pela string do Safari e a ausência da string Chorme. Evite este método.
+
+###### Referências (Inglês)
+
+- https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Cross_browser_testing/Feature_detection
+- https://stackoverflow.com/questions/20104930/whats-the-difference-between-feature-detection-feature-inference-and-using-th
+- https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Explique Ajax com o máximo de detalhes possível
+
+Ajax (JavaScript e XML assíncrono) é um conjunto de técnicas de desenvolvimento web que usam diversas tecnologias web do lado do cliente para criar aplicações web assíncronas. Com Ajax, aplicações web podem enviar e receber dados de um servidor de maneira assíncrona sem interferir o layout ou comportamento da página existente. Ao desacoplar a camada de troca de dados da camada de apresentação, o Ajax permite que páginas web, e por extensão aplicações web, troquem conteúdo dinamicamente sem a necessidade de recarregar a página inteira. Na prática, implementações modernas comumente usam JSON ao invés de XML, devido às vantagens do JSON ser nativo do JavaScript.
+
+A API `XMLHttpRequest` é frequentemente usada para comunicação assíncrona, assim como a API `fetch`.
+
+###### Referências (Inglês)
+
+- https://en.wikipedia.org/wiki/Ajax_(programming)
+- https://developer.mozilla.org/en-US/docs/AJAX
+
+[[↑] Voltar ao topo](#table-of-contents)
+
+### Quais são as vantagens e desvantagens de usar o Ajax?
+
+**Vantagens**
+
+- Melhor interatividade. Novos conteúdos do servidor podem ser alterados dinamicamente sem a necessidade de recarregar a página inteira.
+- Reduz conexões ao servidor já que scripts e folhas de estilo só necessitam ser solicitadas uma vez.
+- O _State_ pode ser mantido em uma página. As variáveis em JavaScript e o _state_ do DOM são persistidos porque o container principal não é recarregado.
+- Basicamente a maioria das vantagens de uma SPA.
+
+**Desvantagens**
+
+- Webpages dinâmicas são mais difíceis de favoritar.
+- Não funciona se o JavaScript estiver desabilitado no navegador.
+- Alguns _webcrawlers_ não executam JavaScript e não "veem" conteúdo que é carregador por JavaScript.
+- Páginas web que usam Ajax para buscar dados provavelmente terão que combinar os dados remotos com templates do lado do cliente para atualizar o DOM. Para isso acontecer, o JavaScript terá que ser parseado e executado no navegador, e aparelhos mais antigos podem ter dificuldade com essas tarefas.
+- Basicamente a maioria das desvantagens de SPAs.
+
+[[↑] Voltar ao topo](#table-of-contents)
